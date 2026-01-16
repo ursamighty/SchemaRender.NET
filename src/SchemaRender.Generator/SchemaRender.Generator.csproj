@@ -11,13 +11,13 @@
     <!-- NuGet Package Properties -->
     <PackageId>SchemaRender.Generator</PackageId>
     <Version>1.0.0</Version>
-    <Authors>MichaelWiedinmyer</Authors>
-    <Company>MichaelWiedinmyer</Company>
+    <Authors>Michael Wiedinmyer</Authors>
+    <Company>Michael Wiedinmyer</Company>
     <Description>Source generator for SchemaRender. Automatically generates optimized ISchema implementations from attributed partial classes.</Description>
     <PackageTags>schema.org;json-ld;seo;source-generator;roslyn;codegen</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/MichaelWiedinmyer/SchemaRender.NET</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/MichaelWiedinmyer/SchemaRender.NET</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/ursamighty/SchemaRender.NET</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/ursamighty/SchemaRender.NET</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageIcon>icon.png</PackageIcon>

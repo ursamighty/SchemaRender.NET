@@ -104,4 +104,4 @@ var business = new MyBusinessSchema
 - No intermediate string allocations
 - Near-zero overhead JSON-LD generation
 
-[1.0.0]: https://github.com/MichaelWiedinmyer/SchemaRender.NET/releases/tag/v1.0.0
+[1.0.0]: https://github.com/ursamighty/SchemaRender.NET/releases/tag/v1.0.0

@@ -318,6 +318,6 @@ This project is licensed under the MIT License - see the [LICENSE.txt](LICENSE.t
 ## Links
 
 - [NuGet Package](https://www.nuget.org/packages/SchemaRender.AspNetCore/)
-- [GitHub Repository](https://github.com/MichaelWiedinmyer/SchemaRender.NET)
-- [Report Issues](https://github.com/MichaelWiedinmyer/SchemaRender.NET/issues)
+- [GitHub Repository](https://github.com/ursamighty/SchemaRender.NET)
+- [Report Issues](https://github.com/ursamighty/SchemaRender.NET/issues)
 - [Schema.org Documentation](https://schema.org)

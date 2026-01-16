@@ -10,13 +10,13 @@
     <!-- NuGet Package Properties -->
     <PackageId>SchemaRender.Core</PackageId>
     <Version>1.0.0</Version>
-    <Authors>MichaelWiedinmyer</Authors>
-    <Company>MichaelWiedinmyer</Company>
+    <Authors>Michael Wiedinmyer</Authors>
+    <Company>Michael Wiedinmyer</Company>
     <Description>High-performance Schema.org structured data (JSON-LD) library for ASP.NET Core. Add strongly-typed, server-rendered schema markup with near-zero overhead.</Description>
     <PackageTags>schema.org;json-ld;seo;structured-data;aspnetcore;performance</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/MichaelWiedinmyer/SchemaRender.NET</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/MichaelWiedinmyer/SchemaRender.NET</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/ursamighty/SchemaRender.NET</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/ursamighty/SchemaRender.NET</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageIcon>icon.png</PackageIcon>
