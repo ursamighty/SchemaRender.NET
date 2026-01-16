@@ -19,9 +19,9 @@ public sealed class OrganizationSchema : ISchema
     public string? Url { get; init; }
 
     /// <summary>
-    /// The URL of the organization's logo.
+    /// The organization's logo.
     /// </summary>
-    public string? Logo { get; init; }
+    public ImageObjectSchema? Logo { get; init; }
 
     /// <summary>
     /// A description of the organization.
@@ -59,8 +59,11 @@ public sealed class OrganizationSchema : ISchema
         if (Url is not null)
             w.WriteString("url", Url);
 
-        if (Logo is not null)
-            w.WriteString("logo", Logo);
+        if (Logo is { HasValue: true })
+        {
+            w.WritePropertyName("logo");
+            Logo.Write(w);
+        }
 
         if (Description is not null)
             w.WriteString("description", Description);

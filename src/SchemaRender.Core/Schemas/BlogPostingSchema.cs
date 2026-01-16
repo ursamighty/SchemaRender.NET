@@ -3,62 +3,72 @@ using System.Text.Json;
 namespace SchemaRender.Schemas;
 
 /// <summary>
-/// Schema.org Article structured data.
-/// See: https://schema.org/Article
+/// Schema.org BlogPosting structured data.
+/// See: https://schema.org/BlogPosting
 /// </summary>
-public sealed class ArticleSchema : ISchema
+public sealed class BlogPostingSchema : ISchema
 {
     /// <summary>
-    /// The headline of the article.
+    /// The headline of the blog post.
     /// </summary>
     public required string Headline { get; init; }
 
     /// <summary>
-    /// A description of the article.
+    /// A brief description or summary of the blog post.
     /// </summary>
     public string? Description { get; init; }
 
     /// <summary>
-    /// The main image for the article.
+    /// The featured image of the blog post.
     /// </summary>
     public ImageObjectSchema? Image { get; init; }
 
     /// <summary>
-    /// The date and time the article was published.
+    /// The date the blog post was published.
     /// </summary>
     public DateTimeOffset? DatePublished { get; init; }
 
     /// <summary>
-    /// The date and time the article was last modified.
+    /// The date the blog post was last modified.
     /// </summary>
     public DateTimeOffset? DateModified { get; init; }
 
     /// <summary>
-    /// The author of the article.
+    /// The author of the blog post.
     /// </summary>
     public PersonSchema? Author { get; init; }
 
     /// <summary>
-    /// The publisher of the article.
+    /// The organization that published the blog post.
     /// </summary>
     public OrganizationSchema? Publisher { get; init; }
 
     /// <summary>
-    /// The main body of the article.
+    /// The main content of the blog post.
     /// </summary>
     public string? ArticleBody { get; init; }
 
     /// <summary>
-    /// The URL of the article.
+    /// The URL of the blog post.
     /// </summary>
     public string? Url { get; init; }
+
+    /// <summary>
+    /// The section or category of the blog post.
+    /// </summary>
+    public string? ArticleSection { get; init; }
+
+    /// <summary>
+    /// The word count of the blog post.
+    /// </summary>
+    public int? WordCount { get; init; }
 
     /// <inheritdoc />
     public void Write(Utf8JsonWriter w)
     {
         w.WriteStartObject();
         w.WriteString("@context", "https://schema.org");
-        w.WriteString("@type", "Article");
+        w.WriteString("@type", "BlogPosting");
         w.WriteString("headline", Headline);
 
         if (Description is not null)
@@ -85,7 +95,7 @@ public sealed class ArticleSchema : ISchema
         if (Publisher is not null)
         {
             w.WritePropertyName("publisher");
-            WritePublisher(w, Publisher);
+            Publisher.Write(w);
         }
 
         if (ArticleBody is not null)
@@ -94,24 +104,11 @@ public sealed class ArticleSchema : ISchema
         if (Url is not null)
             w.WriteString("url", Url);
 
-        w.WriteEndObject();
-    }
+        if (ArticleSection is not null)
+            w.WriteString("articleSection", ArticleSection);
 
-    private static void WritePublisher(Utf8JsonWriter w, OrganizationSchema publisher)
-    {
-        // Write publisher as nested Organization (without @context)
-        w.WriteStartObject();
-        w.WriteString("@type", "Organization");
-        w.WriteString("name", publisher.Name);
-
-        if (publisher.Url is not null)
-            w.WriteString("url", publisher.Url);
-
-        if (publisher.Logo is { HasValue: true })
-        {
-            w.WritePropertyName("logo");
-            publisher.Logo.Write(w);
-        }
+        if (WordCount is not null)
+            w.WriteNumber("wordCount", WordCount.Value);
 
         w.WriteEndObject();
     }

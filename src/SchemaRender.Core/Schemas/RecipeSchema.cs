@@ -1,4 +1,5 @@
 using System.Text.Json;
+using SchemaRender.Helpers;
 
 namespace SchemaRender.Schemas;
 
@@ -51,7 +52,7 @@ public sealed class RecipeSchema : ISchema
     /// <summary>
     /// An image of the completed recipe.
     /// </summary>
-    public string? Image { get; init; }
+    public ImageObjectSchema? Image { get; init; }
 
     /// <summary>
     /// The author of the recipe.
@@ -80,13 +81,13 @@ public sealed class RecipeSchema : ISchema
             w.WriteString("description", Description);
 
         if (CookTime is not null)
-            w.WriteString("cookTime", FormatDuration(CookTime.Value));
+            w.WriteString("cookTime", SchemaHelpers.FormatDuration(CookTime.Value));
 
         if (PrepTime is not null)
-            w.WriteString("prepTime", FormatDuration(PrepTime.Value));
+            w.WriteString("prepTime", SchemaHelpers.FormatDuration(PrepTime.Value));
 
         if (TotalTime is not null)
-            w.WriteString("totalTime", FormatDuration(TotalTime.Value));
+            w.WriteString("totalTime", SchemaHelpers.FormatDuration(TotalTime.Value));
 
         if (RecipeYield is not null)
             w.WriteString("recipeYield", RecipeYield);
@@ -97,8 +98,11 @@ public sealed class RecipeSchema : ISchema
         if (RecipeCuisine is not null)
             w.WriteString("recipeCuisine", RecipeCuisine);
 
-        if (Image is not null)
-            w.WriteString("image", Image);
+        if (Image is { HasValue: true })
+        {
+            w.WritePropertyName("image");
+            Image.Write(w);
+        }
 
         if (Author is not null)
         {
@@ -132,11 +136,4 @@ public sealed class RecipeSchema : ISchema
         w.WriteEndObject();
     }
 
-    private static string FormatDuration(TimeSpan duration)
-    {
-        // ISO 8601 duration format
-        if (duration.TotalHours >= 1)
-            return $"PT{(int)duration.TotalHours}H{duration.Minutes}M";
-        return $"PT{(int)duration.TotalMinutes}M";
-    }
 }

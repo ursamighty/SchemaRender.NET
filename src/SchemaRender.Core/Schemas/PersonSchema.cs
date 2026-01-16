@@ -23,9 +23,9 @@ public sealed class PersonSchema : ISchema
     public string? Url { get; init; }
 
     /// <summary>
-    /// The URL of an image of the person.
+    /// An image of the person.
     /// </summary>
-    public string? Image { get; init; }
+    public ImageObjectSchema? Image { get; init; }
 
     /// <summary>
     /// The person's job title.
@@ -47,8 +47,11 @@ public sealed class PersonSchema : ISchema
         if (Url is not null)
             w.WriteString("url", Url);
 
-        if (Image is not null)
-            w.WriteString("image", Image);
+        if (Image is { HasValue: true })
+        {
+            w.WritePropertyName("image");
+            Image.Write(w);
+        }
 
         if (JobTitle is not null)
             w.WriteString("jobTitle", JobTitle);

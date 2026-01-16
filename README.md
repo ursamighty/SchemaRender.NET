@@ -1,22 +1,11 @@
 # SchemaRender.NET
 
-A high-performance, developer-friendly ASP.NET Core library for adding [Schema.org](https://schema.org) structured data (JSON-LD) to server-rendered pages.
+A developer-friendly ASP.NET Core library for adding [Schema.org](https://schema.org) structured data (JSON-LD) to server-rendered pages.
 
 [![NuGet](https://img.shields.io/nuget/v/SchemaRender.AspNetCore.svg)](https://www.nuget.org/packages/SchemaRender.AspNetCore/)
 [![NuGet Downloads](https://img.shields.io/nuget/dt/SchemaRender.AspNetCore.svg)](https://www.nuget.org/packages/SchemaRender.AspNetCore/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE.txt)
 [![.NET](https://img.shields.io/badge/.NET-8.0-512BD4)](https://dotnet.microsoft.com/)
-
-## Why SchemaRender?
-
-Adding structured data to your web pages improves SEO and enables rich snippets in search results. SchemaRender makes this easy with:
-
-- **Strongly Typed Schemas** - Full IntelliSense and compile-time validation
-- **High Performance** - Direct `Utf8JsonWriter` serialization with near-zero overhead
-- **Source Generator** - Optional code generation eliminates boilerplate and reflection
-- **Server-Side Rendering** - SEO-correct JSON-LD rendered in document `<head>`
-- **ASP.NET Core Native** - Tag Helpers, HtmlHelper extensions, and DI integration
-- **Zero JavaScript** - Pure server-side rendering, no client-side dependencies
 
 ## Installation
 
@@ -26,7 +15,7 @@ Install the ASP.NET Core integration package (includes the core library):
 dotnet add package SchemaRender.AspNetCore
 ```
 
-Optionally, add the source generator for automatic schema generation:
+Optionally, add the source generator for custom schema generation:
 
 ```bash
 dotnet add package SchemaRender.Generator
@@ -163,13 +152,33 @@ Use Razor syntax with the HtmlHelper extension:
 
 ## Built-in Schemas
 
-The library includes ready-to-use implementations of common schemas:
+The library includes ready-to-use implementations of the following schemas:
 
-| Schema | Description |
-|--------|-------------|
-| `RecipeSchema` | Recipes with ingredients, cook time, prep time |
-| `ArticleSchema` | Articles with headline, author, date published |
-| `OrganizationSchema` | Organizations with address and contact info |
+| Schema                  | Description (see Schema.org)                |
+|-------------------------|---------------------------------------------|
+| `AggregateRatingSchema` | Aggregate ratings (e.g., for products)      |
+| `AnswerSchema`          | Answers (for FAQ, Q&A)                      |
+| `ArticleSchema`         | Articles                                    |
+| `BlogPostingSchema`     | Blog posts                                  |
+| `BreadcrumbListSchema`  | Breadcrumb navigation lists                 |
+| `EventSchema`           | Events                                      |
+| `FAQPageSchema`         | FAQ pages                                   |
+| `GeoCoordinatesSchema`  | Geographic coordinates                      |
+| `HowToSchema`           | How-to guides                               |
+| `HowToStepSchema`       | Steps in a how-to guide                     |
+| `ImageObjectSchema`     | Images                                      |
+| `ListItemSchema`        | Items in a list (e.g., breadcrumbs)         |
+| `LocalBusinessSchema`   | Local businesses                            |
+| `OfferSchema`           | Offers (e.g., for products, events)         |
+| `OrganizationSchema`    | Organizations                               |
+| `PersonSchema`          | People                                      |
+| `PostalAddressSchema`   | Postal addresses                            |
+| `ProductSchema`         | Products                                    |
+| `QuestionSchema`        | Questions (for FAQ, Q&A)                    |
+| `RecipeSchema`          | Recipes                                     |
+| `ReviewSchema`          | Reviews                                     |
+| `VideoObjectSchema`     | Videos                                      |
+| `WebSiteSchema`         | Websites                                    |
 
 ## Source Generator Attributes
 
