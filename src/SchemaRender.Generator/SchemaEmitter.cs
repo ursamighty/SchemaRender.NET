@@ -73,88 +73,13 @@ internal static class SchemaEmitter
         sb.AppendLine("        w.WriteString(\"@context\", \"https://schema.org\");");
         sb.AppendLine($"        w.WriteString(\"@type\", \"{model.SchemaTypeName}\");");
 
-        // Separate properties into groups
-        var addressProps = model.Properties.Where(p =>
-            p.PropertyName.StartsWith("Address") || p.PropertyName == "StreetAddress" || p.PropertyName == "PostalCode").ToList();
-        var geoProps = model.Properties.Where(p =>
-            p.PropertyName == "Latitude" || p.PropertyName == "Longitude").ToList();
-        var regularProps = model.Properties.Where(p =>
-            !addressProps.Contains(p) && !geoProps.Contains(p)).ToList();
-
-        // Emit regular properties
-        foreach (var prop in regularProps)
+        foreach (var prop in model.Properties)
         {
             EmitPropertyWrite(sb, prop);
         }
 
-        // Emit address as nested object if any address properties exist
-        if (addressProps.Any())
-        {
-            EmitAddressObject(sb, addressProps);
-        }
-
-        // Emit geo as nested object if lat/lng exist
-        if (geoProps.Any())
-        {
-            EmitGeoObject(sb, geoProps);
-        }
-
         sb.AppendLine("        w.WriteEndObject();");
         sb.AppendLine("    }");
-    }
-
-    private static void EmitAddressObject(StringBuilder sb, List<SchemaPropertyModel> addressProps)
-    {
-        sb.AppendLine();
-
-        // Check if any address property has a value
-        var conditions = addressProps.Select(p => $"this.{p.PropertyName} is not null").ToArray();
-        var condition = string.Join(" || ", conditions);
-
-        sb.AppendLine($"        if ({condition})");
-        sb.AppendLine("        {");
-        sb.AppendLine("            w.WritePropertyName(\"address\");");
-        sb.AppendLine("            w.WriteStartObject();");
-        sb.AppendLine("            w.WriteString(\"@type\", \"PostalAddress\");");
-
-        foreach (var prop in addressProps)
-        {
-            sb.AppendLine();
-            sb.AppendLine($"            if (this.{prop.PropertyName} is not null)");
-            sb.AppendLine("            {");
-
-            // Map property name to Schema.org name
-            var schemaName = prop.PropertyName == "StreetAddress" ? "streetAddress" :
-                            prop.PropertyName == "PostalCode" ? "postalCode" :
-                            ToCamelCase(prop.PropertyName);
-
-            sb.AppendLine($"                w.WriteString(\"{schemaName}\", this.{prop.PropertyName});");
-            sb.AppendLine("            }");
-        }
-
-        sb.AppendLine("            w.WriteEndObject();");
-        sb.AppendLine("        }");
-    }
-
-    private static void EmitGeoObject(StringBuilder sb, List<SchemaPropertyModel> geoProps)
-    {
-        sb.AppendLine();
-
-        var latProp = geoProps.FirstOrDefault(p => p.PropertyName == "Latitude");
-        var lngProp = geoProps.FirstOrDefault(p => p.PropertyName == "Longitude");
-
-        if (latProp is not null && lngProp is not null)
-        {
-            sb.AppendLine($"        if (this.{latProp.PropertyName}.HasValue && this.{lngProp.PropertyName}.HasValue)");
-            sb.AppendLine("        {");
-            sb.AppendLine("            w.WritePropertyName(\"geo\");");
-            sb.AppendLine("            w.WriteStartObject();");
-            sb.AppendLine("            w.WriteString(\"@type\", \"GeoCoordinates\");");
-            sb.AppendLine($"            w.WriteNumber(\"latitude\", this.{latProp.PropertyName}.Value);");
-            sb.AppendLine($"            w.WriteNumber(\"longitude\", this.{lngProp.PropertyName}.Value);");
-            sb.AppendLine("            w.WriteEndObject();");
-            sb.AppendLine("        }");
-        }
     }
 
     private static string ToCamelCase(string name)
@@ -198,17 +123,6 @@ internal static class SchemaEmitter
         if (prop.IsNullable && IsValueType(prop.TypeKind))
         {
             propAccess = $"this.{prop.PropertyName}.Value";
-        }
-
-        // Handle NestedType wrapping
-        if (prop.NestedType is not null)
-        {
-            sb.AppendLine($"{indent}w.WritePropertyName(\"{prop.JsonName}\");");
-            sb.AppendLine($"{indent}w.WriteStartObject();");
-            sb.AppendLine($"{indent}w.WriteString(\"@type\", \"{prop.NestedType}\");");
-            sb.AppendLine($"{indent}w.WriteString(\"name\", {propAccess});");
-            sb.AppendLine($"{indent}w.WriteEndObject();");
-            return;
         }
 
         switch (prop.TypeKind)

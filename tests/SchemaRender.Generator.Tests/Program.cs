@@ -1,5 +1,6 @@
 using SchemaRender;
 using SchemaRender.Generator.Tests;
+using SchemaRender.Schemas;
 
 // Create a recipe schema using the generated class
 var recipe = new TestRecipeSchema
@@ -8,7 +9,7 @@ var recipe = new TestRecipeSchema
     Description = "A delicious homemade lasagna recipe",
     CookTime = TimeSpan.FromMinutes(45),
     PrepTime = TimeSpan.FromMinutes(30),
-    Author = "John Doe",
+    Author = new PersonSchema { Name = "John Doe" },
     Ingredients = ["pasta sheets", "ricotta cheese", "mozzarella", "tomato sauce", "ground beef"]
 };
 
@@ -41,13 +42,19 @@ var business = new LocalBusinessSchema
     Telephone = "+1-555-123-4567",
     Email = "info@joespizza.example.com",
     PriceRange = "$$",
-    StreetAddress = "123 Main St",
-    AddressLocality = "New York",
-    AddressRegion = "NY",
-    PostalCode = "10001",
-    AddressCountry = "US",
-    Latitude = 40.7128,
-    Longitude = -74.0060,
+    Address = new PostalAddressSchema
+    {
+        StreetAddress = "123 Main St",
+        AddressLocality = "New York",
+        AddressRegion = "NY",
+        PostalCode = "10001",
+        AddressCountry = "US"
+    },
+    Geo = new GeoCoordinatesSchema
+    {
+        Latitude = 40.7128,
+        Longitude = -74.0060
+    },
     OpeningHoursSpecification = ["Mo-Fr 11:00-22:00", "Sa-Su 12:00-23:00"],
     ServesCuisine = "Italian",
     SameAs = ["https://facebook.com/joespizza", "https://twitter.com/joespizza"]
@@ -55,6 +62,5 @@ var business = new LocalBusinessSchema
 
 context.Add(business);
 
-
 Console.WriteLine("LocalBusiness JSON-LD:");
-
+Console.WriteLine(SchemaRenderer.RenderSchemaToString(business));

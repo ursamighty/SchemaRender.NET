@@ -56,7 +56,7 @@ public sealed class RecipeSchema : ISchema
     /// <summary>
     /// The author of the recipe.
     /// </summary>
-    public string? Author { get; init; }
+    public PersonSchema? Author { get; init; }
 
     /// <summary>
     /// A list of ingredients used in the recipe.
@@ -103,10 +103,7 @@ public sealed class RecipeSchema : ISchema
         if (Author is not null)
         {
             w.WritePropertyName("author");
-            w.WriteStartObject();
-            w.WriteString("@type", "Person");
-            w.WriteString("name", Author);
-            w.WriteEndObject();
+            Author.Write(w);
         }
 
         if (RecipeIngredient is { Count: > 0 })

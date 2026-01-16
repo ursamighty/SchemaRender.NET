@@ -28,12 +28,6 @@ public sealed class SchemaPropertyAttribute : Attribute
     public string? Name { get; set; }
 
     /// <summary>
-    /// Gets or sets whether to emit this property as a nested @type object.
-    /// When true, the property value is wrapped in { "@type": "TypeName", "name": value }.
-    /// </summary>
-    public string? NestedType { get; set; }
-
-    /// <summary>
     /// Gets or sets the format for TimeSpan properties.
     /// Default is ISO 8601 duration format (e.g., "PT45M").
     /// </summary>

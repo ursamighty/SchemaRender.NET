@@ -36,17 +36,12 @@ public sealed class ArticleSchema : ISchema
     /// <summary>
     /// The author of the article.
     /// </summary>
-    public string? Author { get; init; }
+    public PersonSchema? Author { get; init; }
 
     /// <summary>
     /// The publisher of the article.
     /// </summary>
-    public string? Publisher { get; init; }
-
-    /// <summary>
-    /// The publisher's logo URL.
-    /// </summary>
-    public string? PublisherLogo { get; init; }
+    public OrganizationSchema? Publisher { get; init; }
 
     /// <summary>
     /// The main body of the article.
@@ -81,27 +76,13 @@ public sealed class ArticleSchema : ISchema
         if (Author is not null)
         {
             w.WritePropertyName("author");
-            w.WriteStartObject();
-            w.WriteString("@type", "Person");
-            w.WriteString("name", Author);
-            w.WriteEndObject();
+            Author.Write(w);
         }
 
         if (Publisher is not null)
         {
             w.WritePropertyName("publisher");
-            w.WriteStartObject();
-            w.WriteString("@type", "Organization");
-            w.WriteString("name", Publisher);
-            if (PublisherLogo is not null)
-            {
-                w.WritePropertyName("logo");
-                w.WriteStartObject();
-                w.WriteString("@type", "ImageObject");
-                w.WriteString("url", PublisherLogo);
-                w.WriteEndObject();
-            }
-            w.WriteEndObject();
+            WritePublisher(w, Publisher);
         }
 
         if (ArticleBody is not null)
@@ -109,6 +90,28 @@ public sealed class ArticleSchema : ISchema
 
         if (Url is not null)
             w.WriteString("url", Url);
+
+        w.WriteEndObject();
+    }
+
+    private static void WritePublisher(Utf8JsonWriter w, OrganizationSchema publisher)
+    {
+        // Write publisher as nested Organization (without @context)
+        w.WriteStartObject();
+        w.WriteString("@type", "Organization");
+        w.WriteString("name", publisher.Name);
+
+        if (publisher.Url is not null)
+            w.WriteString("url", publisher.Url);
+
+        if (publisher.Logo is not null)
+        {
+            w.WritePropertyName("logo");
+            w.WriteStartObject();
+            w.WriteString("@type", "ImageObject");
+            w.WriteString("url", publisher.Logo);
+            w.WriteEndObject();
+        }
 
         w.WriteEndObject();
     }

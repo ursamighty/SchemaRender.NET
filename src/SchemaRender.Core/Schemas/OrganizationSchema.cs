@@ -39,29 +39,9 @@ public sealed class OrganizationSchema : ISchema
     public string? Telephone { get; init; }
 
     /// <summary>
-    /// The street address.
+    /// The postal address of the organization.
     /// </summary>
-    public string? StreetAddress { get; init; }
-
-    /// <summary>
-    /// The locality (city).
-    /// </summary>
-    public string? AddressLocality { get; init; }
-
-    /// <summary>
-    /// The region (state/province).
-    /// </summary>
-    public string? AddressRegion { get; init; }
-
-    /// <summary>
-    /// The postal code.
-    /// </summary>
-    public string? PostalCode { get; init; }
-
-    /// <summary>
-    /// The country.
-    /// </summary>
-    public string? AddressCountry { get; init; }
+    public PostalAddressSchema? Address { get; init; }
 
     /// <summary>
     /// Social media profile URLs.
@@ -91,28 +71,10 @@ public sealed class OrganizationSchema : ISchema
         if (Telephone is not null)
             w.WriteString("telephone", Telephone);
 
-        if (HasAddress())
+        if (Address is { HasValue: true })
         {
             w.WritePropertyName("address");
-            w.WriteStartObject();
-            w.WriteString("@type", "PostalAddress");
-
-            if (StreetAddress is not null)
-                w.WriteString("streetAddress", StreetAddress);
-
-            if (AddressLocality is not null)
-                w.WriteString("addressLocality", AddressLocality);
-
-            if (AddressRegion is not null)
-                w.WriteString("addressRegion", AddressRegion);
-
-            if (PostalCode is not null)
-                w.WriteString("postalCode", PostalCode);
-
-            if (AddressCountry is not null)
-                w.WriteString("addressCountry", AddressCountry);
-
-            w.WriteEndObject();
+            Address.Write(w);
         }
 
         if (SameAs is { Count: > 0 })
@@ -126,11 +88,4 @@ public sealed class OrganizationSchema : ISchema
 
         w.WriteEndObject();
     }
-
-    private bool HasAddress() =>
-        StreetAddress is not null ||
-        AddressLocality is not null ||
-        AddressRegion is not null ||
-        PostalCode is not null ||
-        AddressCountry is not null;
 }

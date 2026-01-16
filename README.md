@@ -1,54 +1,67 @@
-# SchemaRender
+# SchemaRender.NET
 
-High-performance, developer-friendly ASP.NET Core library for adding Schema.org structured data (JSON-LD) to server-rendered pages.
+A high-performance, developer-friendly ASP.NET Core library for adding [Schema.org](https://schema.org) structured data (JSON-LD) to server-rendered pages.
 
 [![NuGet](https://img.shields.io/nuget/v/SchemaRender.AspNetCore.svg)](https://www.nuget.org/packages/SchemaRender.AspNetCore/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![NuGet Downloads](https://img.shields.io/nuget/dt/SchemaRender.AspNetCore.svg)](https://www.nuget.org/packages/SchemaRender.AspNetCore/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE.txt)
+[![.NET](https://img.shields.io/badge/.NET-8.0-512BD4)](https://dotnet.microsoft.com/)
 
-## Features
+## Why SchemaRender?
 
-- **Strongly Typed**: Write schemas with full IntelliSense and compile-time validation
-- **High Performance**: Direct `Utf8JsonWriter` serialization with near-zero overhead
-- **Source Generated**: Optional source generator eliminates boilerplate and reflection
-- **Server-Side**: SEO-correct JSON-LD rendered in document `<head>`
-- **ASP.NET Core Native**: Tag Helpers, HtmlHelper extensions, DI integration
-- **Zero JavaScript**: Pure server-side rendering
+Adding structured data to your web pages improves SEO and enables rich snippets in search results. SchemaRender makes this easy with:
 
-## Quick Start
+- **Strongly Typed Schemas** - Full IntelliSense and compile-time validation
+- **High Performance** - Direct `Utf8JsonWriter` serialization with near-zero overhead
+- **Source Generator** - Optional code generation eliminates boilerplate and reflection
+- **Server-Side Rendering** - SEO-correct JSON-LD rendered in document `<head>`
+- **ASP.NET Core Native** - Tag Helpers, HtmlHelper extensions, and DI integration
+- **Zero JavaScript** - Pure server-side rendering, no client-side dependencies
 
-### Installation
+## Installation
+
+Install the ASP.NET Core integration package (includes the core library):
 
 ```bash
-# Core library + ASP.NET Core integration
 dotnet add package SchemaRender.AspNetCore
+```
 
-# Optional: Source generator for automatic schema generation
+Optionally, add the source generator for automatic schema generation:
+
+```bash
 dotnet add package SchemaRender.Generator
 ```
 
-### Basic Setup
+## Quick Start
 
-**1. Register services** in `Program.cs`:
+### 1. Register Services
+
+In your `Program.cs`:
 
 ```csharp
 builder.Services.AddSchemaRender();
 ```
 
-**2. Add Tag Helper** to `_ViewImports.cshtml`:
+### 2. Add Tag Helper
+
+In `_ViewImports.cshtml`:
 
 ```razor
 @addTagHelper *, SchemaRender.AspNetCore
 ```
 
-**3. Render in layout** `_Layout.cshtml`:
+### 3. Render in Layout
+
+In `_Layout.cshtml`:
 
 ```razor
 <head>
+    <!-- other head elements -->
     <schema-render />
 </head>
 ```
 
-**4. Add schemas to pages**:
+### 4. Add Schemas to Pages
 
 ```csharp
 public class RecipePage : SchemaPageModel
@@ -68,9 +81,9 @@ public class RecipePage : SchemaPageModel
 
 ## Usage Patterns
 
-### Using Source Generator
+### Using the Source Generator
 
-Define schemas with attributes:
+Define schemas with attributes and let the generator create the implementation:
 
 ```csharp
 [SchemaType("Recipe")]
@@ -87,11 +100,11 @@ public partial class RecipeSchema
 }
 ```
 
-The generator creates optimized `ISchema` implementation automatically.
+The generator creates an optimized `ISchema` implementation automatically.
 
-### Using Hand-Written Schemas
+### Hand-Written Schemas
 
-Implement `ISchema` directly:
+Implement `ISchema` directly for full control:
 
 ```csharp
 public sealed class ArticleSchema : ISchema
@@ -114,7 +127,9 @@ public sealed class ArticleSchema : ISchema
 }
 ```
 
-### Inject in Pages or Controllers
+### Dependency Injection
+
+Inject `ISchemaContext` directly in pages or controllers:
 
 ```csharp
 public class ProductPage : PageModel
@@ -126,7 +141,9 @@ public class ProductPage : PageModel
 }
 ```
 
-### Use HtmlHelper Extensions
+### HtmlHelper Extensions
+
+Use Razor syntax with the HtmlHelper extension:
 
 ```razor
 @inject ISchemaContext Schema
@@ -146,115 +163,152 @@ public class ProductPage : PageModel
 
 ## Built-in Schemas
 
-The library includes hand-written implementations of common schemas:
+The library includes ready-to-use implementations of common schemas:
 
-- `RecipeSchema`
-- `ArticleSchema`
-- `OrganizationSchema`
+| Schema | Description |
+|--------|-------------|
+| `RecipeSchema` | Recipes with ingredients, cook time, prep time |
+| `ArticleSchema` | Articles with headline, author, date published |
+| `OrganizationSchema` | Organizations with address and contact info |
 
-Use these as examples or extend them for your needs.
+## Source Generator Attributes
 
-## Source Generator Features
+### `[SchemaType("TypeName")]`
 
-### Attributes
+Marks a partial class for schema generation:
 
-- `[SchemaType("TypeName")]` - Marks a partial class for generation
-- `[SchemaProperty(Name = "jsonName", NestedType = "Person")]` - Customizes serialization
-- `[SchemaIgnore]` - Excludes properties from output
+```csharp
+[SchemaType("LocalBusiness")]
+public partial class LocalBusinessSchema { }
+```
 
-### Supported Types
+### `[SchemaProperty]`
 
-- Primitives: `string`, `bool`, `int`, `double`, `decimal`
-- Dates: `DateTime`, `DateTimeOffset`, `DateOnly`, `TimeSpan`
-- Collections: `IReadOnlyList<T>`, `List<T>`, arrays
-- Nested: `ISchema` implementations
-- `Uri`
+Customizes property serialization:
 
-### Special Handling
+```csharp
+[SchemaProperty(Name = "dateCreated", NestedType = "Person")]
+public string? Author { get; init; }
+```
 
-**Address Properties**: Automatically nested as `PostalAddress`
+### `[SchemaIgnore]`
+
+Excludes a property from the generated output:
+
+```csharp
+[SchemaIgnore]
+public string? InternalId { get; init; }
+```
+
+## Supported Types
+
+| Category | Types |
+|----------|-------|
+| Primitives | `string`, `bool`, `int`, `double`, `decimal` |
+| Dates | `DateTime`, `DateTimeOffset`, `DateOnly`, `TimeSpan` |
+| Collections | `IReadOnlyList<T>`, `List<T>`, arrays |
+| References | `Uri`, `ISchema` implementations |
+
+## Special Property Handling
+
+### Address Properties
+
+Properties like `StreetAddress`, `AddressLocality`, `PostalCode`, etc. are automatically nested as `PostalAddress`:
+
 ```csharp
 public string? StreetAddress { get; init; }
 public string? AddressLocality { get; init; }
-// Generates: { "address": { "@type": "PostalAddress", ... } }
+public string? PostalCode { get; init; }
 ```
 
-**Geo Coordinates**: Automatically nested as `GeoCoordinates`
-```csharp
-public double? Latitude { get; init; }
-public double? Longitude { get; init; }
-// Generates: { "geo": { "@type": "GeoCoordinates", ... } }
-```
-
-## Output Example
+Generates:
 
 ```json
 {
-  "@context": "https://schema.org",
-  "@type": "LocalBusiness",
-  "name": "Joe's Pizza",
-  "telephone": "+1-555-123-4567",
-  "priceRange": "$$",
   "address": {
     "@type": "PostalAddress",
     "streetAddress": "123 Main St",
     "addressLocality": "New York",
     "postalCode": "10001"
-  },
+  }
+}
+```
+
+### Geo Coordinates
+
+`Latitude` and `Longitude` properties are automatically nested as `GeoCoordinates`:
+
+```csharp
+public double? Latitude { get; init; }
+public double? Longitude { get; init; }
+```
+
+Generates:
+
+```json
+{
   "geo": {
     "@type": "GeoCoordinates",
     "latitude": 40.7128,
-    "longitude": -74.006
+    "longitude": -74.0060
   }
 }
 ```
 
 ## Performance
 
-SchemaRender is designed for hot-path rendering:
+SchemaRender is optimized for production use:
 
-- **No reflection** at runtime
+- **No reflection** at runtime (source-generated code)
 - **No intermediate strings** or DOM manipulation
 - **No JSON parsing** or serialization round-trips
-- **No client-side JavaScript** required
 - **Direct streaming** to response with `Utf8JsonWriter`
+- **Zero allocations** in hot paths
 
 ## Architecture
 
 ```
-┌─────────────────────────────────────────┐
-│           Your Razor Page               │
-│  Schema.Add(new RecipeSchema {...})    │
-└─────────────────┬───────────────────────┘
-                  │
-                  ▼
-┌─────────────────────────────────────────┐
-│      ISchemaContext (Scoped)            │
-│    Collects schemas per request         │
-└─────────────────┬───────────────────────┘
-                  │
-                  ▼
-┌─────────────────────────────────────────┐
-│         Layout <schema-render />        │
-│   SchemaRenderer.Render(context)        │
-└─────────────────┬───────────────────────┘
-                  │
-                  ▼
-┌─────────────────────────────────────────┐
-│         Utf8JsonWriter                  │
-│    Direct byte[] → Response Stream      │
-└─────────────────────────────────────────┘
+Your Razor Page
+  │
+  │  Schema.Add(new RecipeSchema {...})
+  ▼
+ISchemaContext (Scoped per request)
+  │
+  │  Collects all schemas for the request
+  ▼
+<schema-render /> Tag Helper
+  │
+  │  SchemaRenderer.Render(context)
+  ▼
+Utf8JsonWriter
+  │
+  │  Direct byte[] → Response Stream
+  ▼
+<script type="application/ld+json">...</script>
 ```
 
-## License
+## Requirements
 
-MIT
+- .NET 8.0 or later
+- ASP.NET Core 8.0 or later
 
 ## Contributing
 
-Contributions welcome! Please open an issue or PR.
+Contributions are welcome! Please feel free to submit a Pull Request.
 
-## Support
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-- Report bugs: [GitHub Issues](https://github.com/yourusername/SchemaRender/issues)
-- Documentation: [GitHub Wiki](https://github.com/yourusername/SchemaRender/wiki)
+## License
+
+This project is licensed under the MIT License - see the [LICENSE.txt](LICENSE.txt) file for details.
+
+## Links
+
+- [NuGet Package](https://www.nuget.org/packages/SchemaRender.AspNetCore/)
+- [GitHub Repository](https://github.com/MichaelWiedinmyer/SchemaRender.NET)
+- [Report Issues](https://github.com/MichaelWiedinmyer/SchemaRender.NET/issues)
+- [Schema.org Documentation](https://schema.org)

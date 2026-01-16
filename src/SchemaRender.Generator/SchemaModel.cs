@@ -42,7 +42,6 @@ internal sealed class SchemaPropertyModel
         string? elementType,
         bool isNullable,
         bool isRequired,
-        string? nestedType,
         string timeFormat,
         string dateFormat,
         string typeFullName)
@@ -53,7 +52,6 @@ internal sealed class SchemaPropertyModel
         ElementType = elementType;
         IsNullable = isNullable;
         IsRequired = isRequired;
-        NestedType = nestedType;
         TimeFormat = timeFormat;
         DateFormat = dateFormat;
         TypeFullName = typeFullName;
@@ -65,7 +63,6 @@ internal sealed class SchemaPropertyModel
     public string? ElementType { get; }
     public bool IsNullable { get; }
     public bool IsRequired { get; }
-    public string? NestedType { get; }
     public string TimeFormat { get; }
     public string DateFormat { get; }
     public string TypeFullName { get; }

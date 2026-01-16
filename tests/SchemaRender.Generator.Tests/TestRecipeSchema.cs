@@ -1,4 +1,5 @@
 using SchemaRender;
+using SchemaRender.Schemas;
 
 namespace SchemaRender.Generator.Tests;
 
@@ -11,6 +12,5 @@ public partial class TestRecipeSchema
     public TimeSpan? PrepTime { get; init; }
     public IReadOnlyList<string>? Ingredients { get; init; }
 
-    [SchemaProperty(NestedType = "Person")]
-    public string? Author { get; init; }
+    public PersonSchema? Author { get; init; }
 }

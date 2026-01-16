@@ -101,7 +101,6 @@ public sealed class SchemaSourceGenerator : IIncrementalGenerator
         var type = property.Type;
         var propertyName = property.Name;
         var jsonName = ToCamelCase(propertyName);
-        string? nestedType = null;
         var timeFormat = "Iso8601Duration";
         var dateFormat = "Iso8601";
 
@@ -124,9 +123,6 @@ public sealed class SchemaSourceGenerator : IIncrementalGenerator
                 {
                     case "Name" when namedArg.Value.Value is string n:
                         jsonName = n;
-                        break;
-                    case "NestedType" when namedArg.Value.Value is string nt:
-                        nestedType = nt;
                         break;
                     case "TimeFormat" when namedArg.Value.Value is int tf:
                         timeFormat = tf switch
@@ -161,7 +157,6 @@ public sealed class SchemaSourceGenerator : IIncrementalGenerator
             elementType,
             isNullable,
             isRequired,
-            nestedType,
             timeFormat,
             dateFormat,
             type.ToDisplayString());

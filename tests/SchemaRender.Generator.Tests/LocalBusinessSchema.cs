@@ -1,4 +1,5 @@
 using SchemaRender;
+using SchemaRender.Schemas;
 
 namespace SchemaRender.Generator.Tests;
 
@@ -45,39 +46,14 @@ public partial class LocalBusinessSchema
     public string? PriceRange { get; init; }
 
     /// <summary>
-    /// The street address.
+    /// The postal address of the business.
     /// </summary>
-    public string? StreetAddress { get; init; }
+    public PostalAddressSchema? Address { get; init; }
 
     /// <summary>
-    /// The locality (city).
+    /// The geographic coordinates of the business.
     /// </summary>
-    public string? AddressLocality { get; init; }
-
-    /// <summary>
-    /// The region (state/province).
-    /// </summary>
-    public string? AddressRegion { get; init; }
-
-    /// <summary>
-    /// The postal code.
-    /// </summary>
-    public string? PostalCode { get; init; }
-
-    /// <summary>
-    /// The country.
-    /// </summary>
-    public string? AddressCountry { get; init; }
-
-    /// <summary>
-    /// The latitude coordinate.
-    /// </summary>
-    public double? Latitude { get; init; }
-
-    /// <summary>
-    /// The longitude coordinate.
-    /// </summary>
-    public double? Longitude { get; init; }
+    public GeoCoordinatesSchema? Geo { get; init; }
 
     /// <summary>
     /// The opening hours (e.g., "Mo-Sa 11:00-14:30", "Mo-Th 09:00-17:00").
