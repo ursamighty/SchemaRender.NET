@@ -8,6 +8,11 @@ jobs:
   publish:
     runs-on: ubuntu-latest
 
+    # Required for NuGet Trusted Publishing (OIDC)
+    permissions:
+      id-token: write
+      contents: read
+
     steps:
       - uses: actions/checkout@v4
 
@@ -20,13 +25,20 @@ jobs:
         run: dotnet restore
 
       - name: Build
-        run: dotnet build -c Release
+        run: dotnet build --no-restore -c Release
 
       - name: Pack
         run: |
-          dotnet pack src/SchemaRender.Core/SchemaRender.Core.csproj -c Release -o ./artifacts
-          dotnet pack src/SchemaRender.Generator/SchemaRender.Generator.csproj -c Release -o ./artifacts
-          dotnet pack src/SchemaRender.AspNetCore/SchemaRender.AspNetCore.csproj -c Release -o ./artifacts
+          dotnet pack src/SchemaRender.Core/SchemaRender.Core.csproj -c Release -o ./artifacts --no-build
+          dotnet pack src/SchemaRender.Generator/SchemaRender.Generator.csproj -c Release -o ./artifacts --no-build
+          dotnet pack src/SchemaRender.AspNetCore/SchemaRender.AspNetCore.csproj -c Release -o ./artifacts --no-build
+
+      - name: Verify packages exist
+        run: ls -l ./artifacts/*.nupkg
+
+      - name: NuGet login (OIDC → temp API key)
+        uses: NuGet/login@v1
+        id: login
 
       - name: Push to NuGet
-        run: dotnet nuget push ./artifacts/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+        run: dotnet nuget push "./artifacts/*.nupkg" --api-key ${{ steps.login.outputs.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
