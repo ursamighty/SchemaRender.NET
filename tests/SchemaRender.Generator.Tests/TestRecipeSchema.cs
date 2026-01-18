@@ -3,6 +3,8 @@ using SchemaRender.Schemas;
 
 namespace SchemaRender.Generator.Tests;
 
+// This class is used to test the source generator
+// The generator should create an ISchema implementation for this class
 [SchemaType("Recipe")]
 public partial class TestRecipeSchema
 {
@@ -13,4 +15,7 @@ public partial class TestRecipeSchema
     public IReadOnlyList<string>? Ingredients { get; init; }
 
     public PersonSchema? Author { get; init; }
+
+    [SchemaIgnore]
+    public string? InternalNote { get; init; }
 }
