@@ -22,10 +22,6 @@ dotnet_style_qualification_for_property = true : suggestion
 dotnet_style_qualification_for_method = true : suggestion
 dotnet_style_qualification_for_event = true : suggestion
 
-# JustMock
-dotnet_diagnostic.JMA001.severity = none
-dotnet_diagnostic.JMC001.severity = none
-
 # JSON/YAML files
 [*.{json,yaml,yml}]
 indent_size = 2
