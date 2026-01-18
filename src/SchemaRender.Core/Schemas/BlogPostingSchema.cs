@@ -63,6 +63,73 @@ public sealed class BlogPostingSchema : ISchema
     /// </summary>
     public int? WordCount { get; init; }
 
+    /// <summary>
+    /// An alternative or secondary headline for the blog post.
+    /// </summary>
+    public string? AlternativeHeadline { get; init; }
+
+    /// <summary>
+    /// The language of the blog post content (e.g., "en-US", "es", "fr-FR").
+    /// Uses IETF BCP 47 language codes.
+    /// </summary>
+    public string? InLanguage { get; init; }
+
+    /// <summary>
+    /// Keywords or tags associated with the blog post.
+    /// </summary>
+    public string? Keywords { get; init; }
+
+    /// <summary>
+    /// Indicates whether the blog post is accessible for free.
+    /// </summary>
+    public bool? IsAccessibleForFree { get; init; }
+
+    /// <summary>
+    /// The number of comments on the blog post.
+    /// </summary>
+    public int? CommentCount { get; init; }
+
+    /// <summary>
+    /// The aggregate rating for the blog post.
+    /// </summary>
+    public AggregateRatingSchema? AggregateRating { get; init; }
+
+    /// <summary>
+    /// A video associated with the blog post.
+    /// </summary>
+    public VideoObjectSchema? Video { get; init; }
+
+    /// <summary>
+    /// The canonical URL of the page. Indicates the main page for this blog post.
+    /// </summary>
+    public string? MainEntityOfPage { get; init; }
+
+    /// <summary>
+    /// The URL of a thumbnail image for the blog post.
+    /// </summary>
+    public string? ThumbnailUrl { get; init; }
+
+    /// <summary>
+    /// URLs to reference web pages that confirm the item's identity (e.g., social media profiles).
+    /// </summary>
+    public IReadOnlyList<string>? SameAs { get; init; }
+
+    /// <summary>
+    /// The year the blog post copyright was first asserted.
+    /// </summary>
+    public int? CopyrightYear { get; init; }
+
+    /// <summary>
+    /// A license document that applies to this blog post, typically indicated by URL.
+    /// </summary>
+    public string? License { get; init; }
+
+    /// <summary>
+    /// A CreativeWork such as an image, video, or audio clip shared as part of this blog posting.
+    /// Specific to social media postings.
+    /// </summary>
+    public string? SharedContent { get; init; }
+
     /// <inheritdoc />
     public void Write(Utf8JsonWriter w)
     {
@@ -109,6 +176,57 @@ public sealed class BlogPostingSchema : ISchema
 
         if (WordCount is not null)
             w.WriteNumber("wordCount", WordCount.Value);
+
+        if (AlternativeHeadline is not null)
+            w.WriteString("alternativeHeadline", AlternativeHeadline);
+
+        if (InLanguage is not null)
+            w.WriteString("inLanguage", InLanguage);
+
+        if (Keywords is not null)
+            w.WriteString("keywords", Keywords);
+
+        if (IsAccessibleForFree is not null)
+            w.WriteBoolean("isAccessibleForFree", IsAccessibleForFree.Value);
+
+        if (CommentCount is not null)
+            w.WriteNumber("commentCount", CommentCount.Value);
+
+        if (AggregateRating is { HasValue: true })
+        {
+            w.WritePropertyName("aggregateRating");
+            AggregateRating.Write(w);
+        }
+
+        if (Video is not null)
+        {
+            w.WritePropertyName("video");
+            Video.Write(w);
+        }
+
+        if (MainEntityOfPage is not null)
+            w.WriteString("mainEntityOfPage", MainEntityOfPage);
+
+        if (ThumbnailUrl is not null)
+            w.WriteString("thumbnailUrl", ThumbnailUrl);
+
+        if (SameAs is { Count: > 0 })
+        {
+            w.WritePropertyName("sameAs");
+            w.WriteStartArray();
+            foreach (var url in SameAs)
+                w.WriteStringValue(url);
+            w.WriteEndArray();
+        }
+
+        if (CopyrightYear is not null)
+            w.WriteNumber("copyrightYear", CopyrightYear.Value);
+
+        if (License is not null)
+            w.WriteString("license", License);
+
+        if (SharedContent is not null)
+            w.WriteString("sharedContent", SharedContent);
 
         w.WriteEndObject();
     }

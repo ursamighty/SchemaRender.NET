@@ -22,6 +22,16 @@ public sealed class GeoCoordinatesSchema : ISchema
     /// </summary>
     public required double Longitude { get; init; }
 
+    /// <summary>
+    /// The elevation of the location in meters.
+    /// </summary>
+    public double? Elevation { get; init; }
+
+    /// <summary>
+    /// Physical address of the location.
+    /// </summary>
+    public PostalAddressSchema? Address { get; init; }
+
     /// <inheritdoc />
     public void Write(Utf8JsonWriter w)
     {
@@ -29,6 +39,16 @@ public sealed class GeoCoordinatesSchema : ISchema
         w.WriteString("@type", "GeoCoordinates");
         w.WriteNumber("latitude", Latitude);
         w.WriteNumber("longitude", Longitude);
+
+        if (Elevation is not null)
+            w.WriteNumber("elevation", Elevation.Value);
+
+        if (Address is { HasValue: true })
+        {
+            w.WritePropertyName("address");
+            Address.Write(w);
+        }
+
         w.WriteEndObject();
     }
 }

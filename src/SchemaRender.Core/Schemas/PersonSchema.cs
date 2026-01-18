@@ -37,6 +37,51 @@ public sealed class PersonSchema : ISchema
     /// </summary>
     public IReadOnlyList<string>? SameAs { get; init; }
 
+    /// <summary>
+    /// Email address of the person.
+    /// </summary>
+    public string? Email { get; init; }
+
+    /// <summary>
+    /// Telephone number of the person.
+    /// </summary>
+    public string? Telephone { get; init; }
+
+    /// <summary>
+    /// Physical address of the person.
+    /// </summary>
+    public PostalAddressSchema? Address { get; init; }
+
+    /// <summary>
+    /// Date of birth of the person.
+    /// </summary>
+    public DateTimeOffset? BirthDate { get; init; }
+
+    /// <summary>
+    /// A description of the person.
+    /// </summary>
+    public string? Description { get; init; }
+
+    /// <summary>
+    /// The organization that the person works for.
+    /// </summary>
+    public string? WorksFor { get; init; }
+
+    /// <summary>
+    /// An organization that the person is an alumni of.
+    /// </summary>
+    public string? AlumniOf { get; init; }
+
+    /// <summary>
+    /// An award won by or for the person.
+    /// </summary>
+    public string? Award { get; init; }
+
+    /// <summary>
+    /// Nationality of the person.
+    /// </summary>
+    public string? Nationality { get; init; }
+
     /// <inheritdoc />
     public void Write(Utf8JsonWriter w)
     {
@@ -64,6 +109,36 @@ public sealed class PersonSchema : ISchema
                 w.WriteStringValue(url);
             w.WriteEndArray();
         }
+
+        if (Email is not null)
+            w.WriteString("email", Email);
+
+        if (Telephone is not null)
+            w.WriteString("telephone", Telephone);
+
+        if (Address is { HasValue: true })
+        {
+            w.WritePropertyName("address");
+            Address.Write(w);
+        }
+
+        if (BirthDate is not null)
+            w.WriteString("birthDate", BirthDate.Value.ToString("O"));
+
+        if (Description is not null)
+            w.WriteString("description", Description);
+
+        if (WorksFor is not null)
+            w.WriteString("worksFor", WorksFor);
+
+        if (AlumniOf is not null)
+            w.WriteString("alumniOf", AlumniOf);
+
+        if (Award is not null)
+            w.WriteString("award", Award);
+
+        if (Nationality is not null)
+            w.WriteString("nationality", Nationality);
 
         w.WriteEndObject();
     }

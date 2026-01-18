@@ -69,6 +69,67 @@ public sealed class RecipeSchema : ISchema
     /// </summary>
     public IReadOnlyList<string>? RecipeInstructions { get; init; }
 
+    /// <summary>
+    /// The cooking method used (e.g., "frying", "steaming", "baking").
+    /// </summary>
+    public string? CookingMethod { get; init; }
+
+    /// <summary>
+    /// Nutrition information for the recipe.
+    /// </summary>
+    public NutritionInformationSchema? Nutrition { get; init; }
+
+    /// <summary>
+    /// Indicates a dietary restriction or guideline for which this recipe is suitable
+    /// (e.g., "VeganDiet", "GlutenFreeDiet", "LowFatDiet").
+    /// </summary>
+    public string? SuitableForDiet { get; init; }
+
+    /// <summary>
+    /// The time it takes to actually perform the instructions.
+    /// </summary>
+    public TimeSpan? PerformTime { get; init; }
+
+    /// <summary>
+    /// A sub-property of instrument. A supply consumed when performing instructions.
+    /// </summary>
+    public IReadOnlyList<string>? Supply { get; init; }
+
+    /// <summary>
+    /// A sub-property of instrument. An object used (but not consumed) when performing instructions.
+    /// </summary>
+    public IReadOnlyList<string>? Tool { get; init; }
+
+    /// <summary>
+    /// The estimated cost of the supplies for the recipe.
+    /// </summary>
+    public string? EstimatedCost { get; init; }
+
+    /// <summary>
+    /// Keywords or tags associated with the recipe.
+    /// </summary>
+    public string? Keywords { get; init; }
+
+    /// <summary>
+    /// The aggregate rating for the recipe.
+    /// </summary>
+    public AggregateRatingSchema? AggregateRating { get; init; }
+
+    /// <summary>
+    /// A video demonstrating the recipe.
+    /// </summary>
+    public VideoObjectSchema? Video { get; init; }
+
+    /// <summary>
+    /// The date the recipe was published.
+    /// </summary>
+    public DateTimeOffset? DatePublished { get; init; }
+
+    /// <summary>
+    /// The date the recipe was last modified.
+    /// </summary>
+    public DateTimeOffset? DateModified { get; init; }
+
     /// <inheritdoc />
     public void Write(Utf8JsonWriter w)
     {
@@ -132,6 +193,63 @@ public sealed class RecipeSchema : ISchema
             }
             w.WriteEndArray();
         }
+
+        if (CookingMethod is not null)
+            w.WriteString("cookingMethod", CookingMethod);
+
+        if (Nutrition is { HasValue: true })
+        {
+            w.WritePropertyName("nutrition");
+            Nutrition.Write(w);
+        }
+
+        if (SuitableForDiet is not null)
+            w.WriteString("suitableForDiet", SuitableForDiet);
+
+        if (PerformTime is not null)
+            w.WriteString("performTime", SchemaHelpers.FormatDuration(PerformTime.Value));
+
+        if (Supply is { Count: > 0 })
+        {
+            w.WritePropertyName("supply");
+            w.WriteStartArray();
+            foreach (var supply in Supply)
+                w.WriteStringValue(supply);
+            w.WriteEndArray();
+        }
+
+        if (Tool is { Count: > 0 })
+        {
+            w.WritePropertyName("tool");
+            w.WriteStartArray();
+            foreach (var tool in Tool)
+                w.WriteStringValue(tool);
+            w.WriteEndArray();
+        }
+
+        if (EstimatedCost is not null)
+            w.WriteString("estimatedCost", EstimatedCost);
+
+        if (Keywords is not null)
+            w.WriteString("keywords", Keywords);
+
+        if (AggregateRating is { HasValue: true })
+        {
+            w.WritePropertyName("aggregateRating");
+            AggregateRating.Write(w);
+        }
+
+        if (Video is not null)
+        {
+            w.WritePropertyName("video");
+            Video.Write(w);
+        }
+
+        if (DatePublished is not null)
+            w.WriteString("datePublished", DatePublished.Value.ToString("O"));
+
+        if (DateModified is not null)
+            w.WriteString("dateModified", DateModified.Value.ToString("O"));
 
         w.WriteEndObject();
     }

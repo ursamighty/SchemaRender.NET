@@ -83,6 +83,26 @@ public sealed class LocalBusinessSchema : ISchema
     /// </summary>
     public AggregateRatingSchema? AggregateRating { get; init; }
 
+    /// <summary>
+    /// Reviews of the business.
+    /// </summary>
+    public IReadOnlyList<ReviewSchema>? Review { get; init; }
+
+    /// <summary>
+    /// The geographic area where the business provides service.
+    /// </summary>
+    public string? AreaServed { get; init; }
+
+    /// <summary>
+    /// The logo of the business.
+    /// </summary>
+    public ImageObjectSchema? Logo { get; init; }
+
+    /// <summary>
+    /// A short textual code that uniquely identifies a place of business (e.g., branch code).
+    /// </summary>
+    public string? BranchCode { get; init; }
+
     /// <inheritdoc />
     public void Write(Utf8JsonWriter w)
     {
@@ -156,6 +176,29 @@ public sealed class LocalBusinessSchema : ISchema
             w.WritePropertyName("aggregateRating");
             AggregateRating.Write(w);
         }
+
+        if (Review is { Count: > 0 })
+        {
+            w.WritePropertyName("review");
+            w.WriteStartArray();
+            foreach (var review in Review)
+            {
+                review.Write(w, includeContext: false);
+            }
+            w.WriteEndArray();
+        }
+
+        if (AreaServed is not null)
+            w.WriteString("areaServed", AreaServed);
+
+        if (Logo is { HasValue: true })
+        {
+            w.WritePropertyName("logo");
+            Logo.Write(w);
+        }
+
+        if (BranchCode is not null)
+            w.WriteString("branchCode", BranchCode);
 
         w.WriteEndObject();
     }

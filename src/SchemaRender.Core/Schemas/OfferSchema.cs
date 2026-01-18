@@ -52,6 +52,31 @@ public sealed class OfferSchema : ISchema
     /// </summary>
     public string? ItemCondition { get; init; }
 
+    /// <summary>
+    /// The date after which the price is no longer available.
+    /// </summary>
+    public DateTimeOffset? PriceValidUntil { get; init; }
+
+    /// <summary>
+    /// The item being offered (e.g., product name).
+    /// </summary>
+    public string? ItemOffered { get; init; }
+
+    /// <summary>
+    /// The Stock Keeping Unit (SKU) of the item being offered.
+    /// </summary>
+    public string? Sku { get; init; }
+
+    /// <summary>
+    /// The Global Trade Item Number (GTIN) of the item being offered.
+    /// </summary>
+    public string? Gtin { get; init; }
+
+    /// <summary>
+    /// The geographic area where the offer is eligible (e.g., "US", "California").
+    /// </summary>
+    public string? EligibleRegion { get; init; }
+
     /// <inheritdoc />
     public void Write(Utf8JsonWriter w)
     {
@@ -85,6 +110,21 @@ public sealed class OfferSchema : ISchema
         if (ItemCondition is not null)
             w.WriteString("itemCondition", ItemCondition);
 
+        if (PriceValidUntil is not null)
+            w.WriteString("priceValidUntil", PriceValidUntil.Value.ToString("O"));
+
+        if (ItemOffered is not null)
+            w.WriteString("itemOffered", ItemOffered);
+
+        if (Sku is not null)
+            w.WriteString("sku", Sku);
+
+        if (Gtin is not null)
+            w.WriteString("gtin", Gtin);
+
+        if (EligibleRegion is not null)
+            w.WriteString("eligibleRegion", EligibleRegion);
+
         w.WriteEndObject();
     }
 
@@ -99,5 +139,10 @@ public sealed class OfferSchema : ISchema
         ValidFrom is not null ||
         ValidThrough is not null ||
         Seller is not null ||
-        ItemCondition is not null;
+        ItemCondition is not null ||
+        PriceValidUntil is not null ||
+        ItemOffered is not null ||
+        Sku is not null ||
+        Gtin is not null ||
+        EligibleRegion is not null;
 }

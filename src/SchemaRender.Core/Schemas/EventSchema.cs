@@ -1,4 +1,5 @@
 using System.Text.Json;
+using SchemaRender.Helpers;
 
 namespace SchemaRender.Schemas;
 
@@ -63,6 +64,46 @@ public sealed class EventSchema : ISchema
     /// </summary>
     public string? EventAttendanceMode { get; init; }
 
+    /// <summary>
+    /// The URL of the event page.
+    /// </summary>
+    public string? Url { get; init; }
+
+    /// <summary>
+    /// A performer at the event (e.g., a presenter, musician, musical group, etc.).
+    /// </summary>
+    public string? Performer { get; init; }
+
+    /// <summary>
+    /// The aggregate rating for the event.
+    /// </summary>
+    public AggregateRatingSchema? AggregateRating { get; init; }
+
+    /// <summary>
+    /// Indicates whether the event is accessible for free.
+    /// </summary>
+    public bool? IsAccessibleForFree { get; init; }
+
+    /// <summary>
+    /// The maximum number of attendees that can attend the event.
+    /// </summary>
+    public int? MaximumAttendeeCapacity { get; init; }
+
+    /// <summary>
+    /// The typical expected age range for the event (e.g., "18+", "7-12").
+    /// </summary>
+    public string? TypicalAgeRange { get; init; }
+
+    /// <summary>
+    /// A person or organization that supports the event through financial or other contributions.
+    /// </summary>
+    public string? Sponsor { get; init; }
+
+    /// <summary>
+    /// The duration of the event (alternative to specifying both startDate and endDate).
+    /// </summary>
+    public TimeSpan? Duration { get; init; }
+
     /// <inheritdoc />
     public void Write(Utf8JsonWriter w)
     {
@@ -116,6 +157,33 @@ public sealed class EventSchema : ISchema
 
         if (EventAttendanceMode is not null)
             w.WriteString("eventAttendanceMode", EventAttendanceMode);
+
+        if (Url is not null)
+            w.WriteString("url", Url);
+
+        if (Performer is not null)
+            w.WriteString("performer", Performer);
+
+        if (AggregateRating is { HasValue: true })
+        {
+            w.WritePropertyName("aggregateRating");
+            AggregateRating.Write(w);
+        }
+
+        if (IsAccessibleForFree is not null)
+            w.WriteBoolean("isAccessibleForFree", IsAccessibleForFree.Value);
+
+        if (MaximumAttendeeCapacity is not null)
+            w.WriteNumber("maximumAttendeeCapacity", MaximumAttendeeCapacity.Value);
+
+        if (TypicalAgeRange is not null)
+            w.WriteString("typicalAgeRange", TypicalAgeRange);
+
+        if (Sponsor is not null)
+            w.WriteString("sponsor", Sponsor);
+
+        if (Duration is not null)
+            w.WriteString("duration", SchemaHelpers.FormatDuration(Duration.Value));
 
         w.WriteEndObject();
     }

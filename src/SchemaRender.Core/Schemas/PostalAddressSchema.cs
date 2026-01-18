@@ -37,6 +37,11 @@ public sealed class PostalAddressSchema : ISchema
     /// </summary>
     public string? AddressCountry { get; init; }
 
+    /// <summary>
+    /// The post office box number for PO box addresses.
+    /// </summary>
+    public string? PostOfficeBoxNumber { get; init; }
+
     /// <inheritdoc />
     public void Write(Utf8JsonWriter w)
     {
@@ -58,6 +63,9 @@ public sealed class PostalAddressSchema : ISchema
         if (AddressCountry is not null)
             w.WriteString("addressCountry", AddressCountry);
 
+        if (PostOfficeBoxNumber is not null)
+            w.WriteString("postOfficeBoxNumber", PostOfficeBoxNumber);
+
         w.WriteEndObject();
     }
 
@@ -69,5 +77,6 @@ public sealed class PostalAddressSchema : ISchema
         AddressLocality is not null ||
         AddressRegion is not null ||
         PostalCode is not null ||
-        AddressCountry is not null;
+        AddressCountry is not null ||
+        PostOfficeBoxNumber is not null;
 }

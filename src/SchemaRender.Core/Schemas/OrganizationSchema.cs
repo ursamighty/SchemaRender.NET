@@ -48,6 +48,46 @@ public sealed class OrganizationSchema : ISchema
     /// </summary>
     public IReadOnlyList<string>? SameAs { get; init; }
 
+    /// <summary>
+    /// The official name of the organization (e.g., the registered company name).
+    /// </summary>
+    public string? LegalName { get; init; }
+
+    /// <summary>
+    /// The person or organization that founded this organization.
+    /// </summary>
+    public string? Founder { get; init; }
+
+    /// <summary>
+    /// The date the organization was founded.
+    /// </summary>
+    public DateTimeOffset? FoundingDate { get; init; }
+
+    /// <summary>
+    /// The number of employees in the organization.
+    /// </summary>
+    public int? NumberOfEmployees { get; init; }
+
+    /// <summary>
+    /// The Tax / Fiscal ID of the organization.
+    /// </summary>
+    public string? TaxID { get; init; }
+
+    /// <summary>
+    /// An identifier for the organization (e.g., DUNS number, LEI code).
+    /// </summary>
+    public string? Identifier { get; init; }
+
+    /// <summary>
+    /// The larger organization that this organization is a part of.
+    /// </summary>
+    public string? ParentOrganization { get; init; }
+
+    /// <summary>
+    /// The geographic area where the organization provides service.
+    /// </summary>
+    public string? AreaServed { get; init; }
+
     /// <inheritdoc />
     public void Write(Utf8JsonWriter w)
     {
@@ -88,6 +128,30 @@ public sealed class OrganizationSchema : ISchema
                 w.WriteStringValue(url);
             w.WriteEndArray();
         }
+
+        if (LegalName is not null)
+            w.WriteString("legalName", LegalName);
+
+        if (Founder is not null)
+            w.WriteString("founder", Founder);
+
+        if (FoundingDate is not null)
+            w.WriteString("foundingDate", FoundingDate.Value.ToString("O"));
+
+        if (NumberOfEmployees is not null)
+            w.WriteNumber("numberOfEmployees", NumberOfEmployees.Value);
+
+        if (TaxID is not null)
+            w.WriteString("taxID", TaxID);
+
+        if (Identifier is not null)
+            w.WriteString("identifier", Identifier);
+
+        if (ParentOrganization is not null)
+            w.WriteString("parentOrganization", ParentOrganization);
+
+        if (AreaServed is not null)
+            w.WriteString("areaServed", AreaServed);
 
         w.WriteEndObject();
     }
