@@ -1,300 +1,212 @@
 # SchemaRender.NET
 
-A developer-friendly ASP.NET Core library for adding [Schema.org](https://schema.org) structured data (JSON-LD) to server-rendered pages.
+An easy way to add [Schema.org](https://schema.org) structured data (JSON-LD) to your ASP.NET Core application.
 
 [![NuGet](https://img.shields.io/nuget/v/SchemaRender.AspNetCore.svg)](https://www.nuget.org/packages/SchemaRender.AspNetCore/)
 [![NuGet Downloads](https://img.shields.io/nuget/dt/SchemaRender.AspNetCore.svg)](https://www.nuget.org/packages/SchemaRender.AspNetCore/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE.txt)
 [![.NET](https://img.shields.io/badge/.NET-8.0-512BD4)](https://dotnet.microsoft.com/)
 
-## Installation
+## Why SchemaRender?
 
-Install the ASP.NET Core integration package (includes the core library):
+Adding structured data to your site improves SEO and how search engines display your content. SchemaRender makes this trivial:
+
+- **Type-safe and intuitive** - Work with C# objects instead of manually writing JSON-LD
+- **Seamless integration** - Add schemas directly in your page models and controllers
+- **Zero boilerplate** - Just add schemas to the page, SchemaRender handles the rendering
+- **Production-ready** - Includes 20+ common schemas, or generate custom ones with attributes
+- **Optimized** - Source-generated code with no reflection and direct JSON streaming
+
+## Quick Start
+
+**1. Install the package:**
 
 ```bash
 dotnet add package SchemaRender.AspNetCore
 ```
 
-Optionally, add the source generator for custom schema generation:
-
-```bash
-dotnet add package SchemaRender.Generator
-```
-
-## Quick Start
-
-### 1. Register Services
-
-In your `Program.cs`:
+**2. Register in `Program.cs`:**
 
 ```csharp
 builder.Services.AddSchemaRender();
 ```
 
-### 2. Add Tag Helper
-
-In `_ViewImports.cshtml`:
+**3. Add the tag helper to `_ViewImports.cshtml`:**
 
 ```razor
 @addTagHelper *, SchemaRender.AspNetCore
 ```
 
-### 3. Render in Layout
-
-In `_Layout.cshtml`:
+**4. Render schemas in your layout's `<head>`:**
 
 ```razor
-<head>
-    <!-- other head elements -->
-    <schema-render />
-</head>
+<schema-render />
 ```
 
-### 4. Add Schemas to Pages
+**5. Add schemas in your pages:**
 
 ```csharp
-public class RecipePage : SchemaPageModel
+public class RecipePage : PageModel
 {
-    public void OnGet()
+    public void OnGet([FromServices] ISchemaContext schema)
     {
-        Schema.Add(new RecipeSchema
+        schema.Add(new RecipeSchema
         {
-            Name = "Best Lasagna Ever",
+            Name = "Mom's Lasagna",
             CookTime = TimeSpan.FromMinutes(45),
-            PrepTime = TimeSpan.FromMinutes(30),
-            RecipeIngredient = ["pasta", "ricotta", "mozzarella", "sauce"]
+            RecipeIngredient = ["pasta", "ricotta", "mozzarella"]
         });
     }
 }
 ```
 
+That's it! SchemaRender will automatically output the JSON-LD script tags.
+
 ## Usage Patterns
 
-### Using the Source Generator
+### Razor Pages
 
-Define schemas with attributes and let the generator create the implementation:
-
-```csharp
-[SchemaType("Recipe")]
-public partial class RecipeSchema
-{
-    public required string Name { get; init; }
-    public TimeSpan? CookTime { get; init; }
-    public TimeSpan? PrepTime { get; init; }
-
-    [SchemaProperty(NestedType = "Person")]
-    public string? Author { get; init; }
-
-    public IReadOnlyList<string>? RecipeIngredient { get; init; }
-}
-```
-
-The generator creates an optimized `ISchema` implementation automatically.
-
-### Hand-Written Schemas
-
-Implement `ISchema` directly for full control:
+Inject `ISchemaContext` using `[FromServices]`:
 
 ```csharp
-public sealed class ArticleSchema : ISchema
-{
-    public required string Headline { get; init; }
-    public DateTimeOffset? DatePublished { get; init; }
-
-    public void Write(Utf8JsonWriter w)
-    {
-        w.WriteStartObject();
-        w.WriteString("@context", "https://schema.org");
-        w.WriteString("@type", "Article");
-        w.WriteString("headline", Headline);
-
-        if (DatePublished is not null)
-            w.WriteString("datePublished", DatePublished.Value.ToString("O"));
-
-        w.WriteEndObject();
-    }
-}
-```
-
-### Dependency Injection
-
-Inject `ISchemaContext` directly in pages or controllers:
-
-```csharp
-public class ProductPage : PageModel
+public class ArticlePage : PageModel
 {
     public void OnGet([FromServices] ISchemaContext schema)
     {
-        schema.Add(new ProductSchema { Name = "Widget" });
+        schema.Add(new ArticleSchema
+        {
+            Headline = "My Article",
+            DatePublished = DateTimeOffset.Now,
+            Author = new PersonSchema { Name = "Jane Doe" }
+        });
     }
 }
 ```
 
-### HtmlHelper Extensions
+### MVC Controllers
 
-Use Razor syntax with the HtmlHelper extension:
+Inject via controller constructor or action parameter:
+
+```csharp
+public class ProductController : Controller
+{
+    private readonly ISchemaContext _schema;
+
+    public ProductController(ISchemaContext schema)
+    {
+        _schema = schema;
+    }
+
+    public IActionResult Details(int id)
+    {
+        var product = GetProduct(id);
+        _schema.Add(new ProductSchema
+        {
+            Name = product.Name,
+            Description = product.Description,
+            Image = new ImageObjectSchema { Url = product.ImageUrl }
+        });
+        return View(product);
+    }
+}
+```
+
+### Razor Views
+
+Use `@inject` to add schemas directly in views:
 
 ```razor
 @inject ISchemaContext Schema
+@model BlogPost
 
 @{
-    Schema.Add(new ArticleSchema
+    Schema.Add(new BlogPostingSchema
     {
-        Headline = "My Post",
-        DatePublished = DateTimeOffset.Now
+        Headline = Model.Title,
+        DatePublished = Model.PublishedDate,
+        Author = new PersonSchema { Name = Model.AuthorName }
     });
 }
 
-<head>
-    @Html.RenderSchemas()
-</head>
+<article>
+    <h1>@Model.Title</h1>
+    <!-- your content -->
+</article>
 ```
 
-## Built-in Schemas
+### Generate Custom Schemas
 
-The library includes ready-to-use implementations of the following schemas:
+Add the generator package to create schemas for types not included in the library:
 
-| Schema                  | Description (see Schema.org)                |
-|-------------------------|---------------------------------------------|
-| `AggregateRatingSchema` | Aggregate ratings (e.g., for products)      |
-| `AnswerSchema`          | Answers (for FAQ, Q&A)                      |
-| `ArticleSchema`         | Articles                                    |
-| `BlogPostingSchema`     | Blog posts                                  |
-| `BreadcrumbListSchema`  | Breadcrumb navigation lists                 |
-| `EventSchema`           | Events                                      |
-| `FAQPageSchema`         | FAQ pages                                   |
-| `GeoCoordinatesSchema`  | Geographic coordinates                      |
-| `HowToSchema`           | How-to guides                               |
-| `HowToStepSchema`       | Steps in a how-to guide                     |
-| `ImageObjectSchema`     | Images                                      |
-| `ListItemSchema`        | Items in a list (e.g., breadcrumbs)         |
-| `LocalBusinessSchema`   | Local businesses                            |
-| `OfferSchema`           | Offers (e.g., for products, events)         |
-| `OrganizationSchema`    | Organizations                               |
-| `PersonSchema`          | People                                      |
-| `PostalAddressSchema`   | Postal addresses                            |
-| `ProductSchema`         | Products                                    |
-| `QuestionSchema`        | Questions (for FAQ, Q&A)                    |
-| `RecipeSchema`          | Recipes                                     |
-| `ReviewSchema`          | Reviews                                     |
-| `VideoObjectSchema`     | Videos                                      |
-| `WebSiteSchema`         | Websites                                    |
+```bash
+dotnet add package SchemaRender.Generator
+```
 
-## Source Generator Attributes
+```csharp
+[SchemaType("JobPosting")]
+public partial class JobPostingSchema
+{
+    public required string Title { get; init; }
+    public string? Description { get; init; }
+    public DateTimeOffset? DatePosted { get; init; }
+    public DateTimeOffset? ValidThrough { get; init; }
 
-### `[SchemaType("TypeName")]`
+    [SchemaProperty(NestedType = "Organization")]
+    public string? HiringOrganization { get; init; }
 
-Marks a partial class for schema generation:
+    public string? EmploymentType { get; init; }
+    public string? JobLocation { get; init; }
+}
+```
+
+The generator creates the `ISchema` implementation automatically, handling JSON serialization and Schema.org formatting.
+
+## Source Generator
+
+Install the optional generator package to create custom schemas:
+
+```bash
+dotnet add package SchemaRender.Generator
+```
+
+### Attributes
+
+**`[SchemaType("TypeName")]`** - Marks a partial class for generation:
 
 ```csharp
 [SchemaType("LocalBusiness")]
-public partial class LocalBusinessSchema { }
+public partial class LocalBusinessSchema
+{
+    public required string Name { get; init; }
+}
 ```
 
-### `[SchemaProperty]`
-
-Customizes property serialization:
+**`[SchemaProperty(Name = "...")]`** - Customizes the JSON property name:
 
 ```csharp
-[SchemaProperty(Name = "dateCreated", NestedType = "Person")]
-public string? Author { get; init; }
+[SchemaProperty(Name = "dateCreated")]
+public DateTimeOffset? CreatedAt { get; init; }
 ```
 
-### `[SchemaIgnore]`
-
-Excludes a property from the generated output:
+**`[SchemaIgnore]`** - Excludes a property from output:
 
 ```csharp
 [SchemaIgnore]
-public string? InternalId { get; init; }
+public int InternalId { get; init; }
 ```
 
-## Supported Types
+### Supported Types
 
-| Category | Types |
-|----------|-------|
-| Primitives | `string`, `bool`, `int`, `double`, `decimal` |
-| Dates | `DateTime`, `DateTimeOffset`, `DateOnly`, `TimeSpan` |
-| Collections | `IReadOnlyList<T>`, `List<T>`, arrays |
-| References | `Uri`, `ISchema` implementations |
+The generator supports primitives (`string`, `bool`, `int`, `double`), dates (`DateTime`, `DateTimeOffset`, `DateOnly`, `TimeSpan`), collections (`IReadOnlyList<T>`, arrays), and nested `ISchema` implementations.
 
-## Special Property Handling
+## Built-in Schemas
 
-### Address Properties
+The library includes 20+ ready-to-use schemas:
 
-Properties like `StreetAddress`, `AddressLocality`, `PostalCode`, etc. are automatically nested as `PostalAddress`:
+`Article`, `BlogPosting`, `Recipe`, `Product`, `LocalBusiness`, `Event`, `FAQPage`, `HowTo`, `BreadcrumbList`, `Review`, `AggregateRating`, `Offer`, `Organization`, `Person`, `ImageObject`, `VideoObject`, `WebSite`, `Question`, `Answer`, `ListItem`, `PostalAddress`, `GeoCoordinates`, `HowToStep`
 
-```csharp
-public string? StreetAddress { get; init; }
-public string? AddressLocality { get; init; }
-public string? PostalCode { get; init; }
-```
+See the [Schema.org documentation](https://schema.org) for details on each type.
 
-Generates:
-
-```json
-{
-  "address": {
-    "@type": "PostalAddress",
-    "streetAddress": "123 Main St",
-    "addressLocality": "New York",
-    "postalCode": "10001"
-  }
-}
-```
-
-### Geo Coordinates
-
-`Latitude` and `Longitude` properties are automatically nested as `GeoCoordinates`:
-
-```csharp
-public double? Latitude { get; init; }
-public double? Longitude { get; init; }
-```
-
-Generates:
-
-```json
-{
-  "geo": {
-    "@type": "GeoCoordinates",
-    "latitude": 40.7128,
-    "longitude": -74.0060
-  }
-}
-```
-
-## Performance
-
-SchemaRender is optimized for production use:
-
-- **No reflection** at runtime (source-generated code)
-- **No intermediate strings** or DOM manipulation
-- **No JSON parsing** or serialization round-trips
-- **Direct streaming** to response with `Utf8JsonWriter`
-- **Zero allocations** in hot paths
-
-## Architecture
-
-```
-Your Razor Page
-  │
-  │  Schema.Add(new RecipeSchema {...})
-  ▼
-ISchemaContext (Scoped per request)
-  │
-  │  Collects all schemas for the request
-  ▼
-<schema-render /> Tag Helper
-  │
-  │  SchemaRenderer.Render(context)
-  ▼
-Utf8JsonWriter
-  │
-  │  Direct byte[] → Response Stream
-  ▼
-<script type="application/ld+json">...</script>
-```
 
 ## Requirements
 
