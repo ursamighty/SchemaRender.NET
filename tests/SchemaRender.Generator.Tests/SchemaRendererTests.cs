@@ -22,13 +22,10 @@ public class SchemaRendererTests
     }
 
     [TestMethod]
-    [ExpectedException(typeof(ArgumentNullException))]
     public void RenderToString_WithNullContext_ThrowsArgumentNullException()
     {
-        // Act
-        SchemaRenderer.RenderToString(null!);
-
-        // Assert - ExpectedException
+        // Act & Assert
+        Assert.ThrowsExactly<ArgumentNullException>(() => SchemaRenderer.RenderToString(null!));
     }
 
     [TestMethod]
@@ -85,13 +82,10 @@ public class SchemaRendererTests
     }
 
     [TestMethod]
-    [ExpectedException(typeof(ArgumentNullException))]
     public void RenderSchemaToString_WithNullSchema_ThrowsArgumentNullException()
     {
-        // Act
-        SchemaRenderer.RenderSchemaToString(null!);
-
-        // Assert - ExpectedException
+        // Act & Assert
+        Assert.ThrowsExactly<ArgumentNullException>(() => SchemaRenderer.RenderSchemaToString(null!));
     }
 
     [TestMethod]
@@ -127,29 +121,23 @@ public class SchemaRendererTests
     }
 
     [TestMethod]
-    [ExpectedException(typeof(ArgumentNullException))]
     public void Render_WithNullContext_ThrowsArgumentNullException()
     {
         // Arrange
         using var stream = new MemoryStream();
 
-        // Act
-        SchemaRenderer.Render(null!, stream);
-
-        // Assert - ExpectedException
+        // Act & Assert
+        Assert.ThrowsExactly<ArgumentNullException>(() => SchemaRenderer.Render(null!, stream));
     }
 
     [TestMethod]
-    [ExpectedException(typeof(ArgumentNullException))]
     public void Render_WithNullStream_ThrowsArgumentNullException()
     {
         // Arrange
         var context = new SchemaContext();
 
-        // Act
-        SchemaRenderer.Render(context, null!);
-
-        // Assert - ExpectedException
+        // Act & Assert
+        Assert.ThrowsExactly<ArgumentNullException>(() => SchemaRenderer.Render(context, null!));
     }
 
     [TestMethod]
@@ -172,29 +160,23 @@ public class SchemaRendererTests
     }
 
     [TestMethod]
-    [ExpectedException(typeof(ArgumentNullException))]
     public void RenderSchema_WithNullSchema_ThrowsArgumentNullException()
     {
         // Arrange
         using var stream = new MemoryStream();
 
-        // Act
-        SchemaRenderer.RenderSchema(null!, stream);
-
-        // Assert - ExpectedException
+        // Act & Assert
+        Assert.ThrowsExactly<ArgumentNullException>(() => SchemaRenderer.RenderSchema(null!, stream));
     }
 
     [TestMethod]
-    [ExpectedException(typeof(ArgumentNullException))]
     public void RenderSchema_WithNullStream_ThrowsArgumentNullException()
     {
         // Arrange
         var schema = new PersonSchema { Name = "Test" };
 
-        // Act
-        SchemaRenderer.RenderSchema(schema, null!);
-
-        // Assert - ExpectedException
+        // Act & Assert
+        Assert.ThrowsExactly<ArgumentNullException>(() => SchemaRenderer.RenderSchema(schema, null!));
     }
 
     [TestMethod]

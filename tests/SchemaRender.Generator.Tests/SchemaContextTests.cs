@@ -48,16 +48,13 @@ public class SchemaContextTests
     }
 
     [TestMethod]
-    [ExpectedException(typeof(ArgumentNullException))]
     public void Add_WithNullSchema_ThrowsArgumentNullException()
     {
         // Arrange
         var context = new SchemaContext();
 
-        // Act
-        context.Add(null!);
-
-        // Assert - ExpectedException
+        // Act & Assert
+        Assert.ThrowsExactly<ArgumentNullException>(() => context.Add(null!));
     }
 
     [TestMethod]
